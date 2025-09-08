@@ -5,21 +5,22 @@
 # STATIC ANALYZER SETTINGS
 # -------------------------
 
+import os  # ← 위로 올려 정리
+
 # ==========ANDROID SKIP CLASSES==========================
-# Common third party classes/paths that will be skipped
-# during static analysis
-import os
+# Common third party classes/paths that will be skipped during static analysis
 SKIP_CLASS_PATH = {
-'com/google/', 'androidx', 'okhttp2/', 'okhttp3/',
-'com/android/', 'com/squareup', 'okhttp/'
-'android/content/', 'com/twitter/', 'twitter4j/',
-'android/support/', 'org/apache/', 'oauth/signpost',
-'android/arch', 'org/chromium/', 'com/facebook',
-'org/spongycastle', 'org/bouncycastle',
-'com/amazon/identity/', 'io/fabric/sdk',
-'com/instabug', 'com/crashlytics/android',
-'kotlinx/', 'kotlin/',
+    'com/google/', 'androidx', 'okhttp2/', 'okhttp3/',
+    'com/android/', 'com/squareup', 'okhttp/',   # ← 콤마 추가
+    'android/content/', 'com/twitter/', 'twitter4j/',
+    'android/support/', 'org/apache/', 'oauth/signpost',
+    'android/arch', 'org/chromium/', 'com/facebook',
+    'org/spongycastle', 'org/bouncycastle',
+    'com/amazon/identity/', 'io/fabric/sdk',
+    'com/instabug', 'com/crashlytics/android',
+    'kotlinx/', 'kotlin/',
 }
+
 # Disable CVSSV2 Score by default
 CVSS_SCORE_ENABLED = bool(os.getenv('MOBSF_CVSS_SCORE_ENABLED', ''))
 # NIAP Scan
@@ -33,6 +34,7 @@ SO_ANALYSIS_ENABLED = os.getenv('MOBSF_SO_ANALYSIS_ENABLED', '1')
 # iOS Dynamic Library Binary Analysis
 DYLIB_ANALYSIS_ENABLED = os.getenv('MOBSF_DYLIB_ANALYSIS_ENABLED', '1')
 # =================================================
+
 # --------------------------
 # MALWARE ANALYZER SETTINGS
 # --------------------------
@@ -40,12 +42,15 @@ DYLIB_ANALYSIS_ENABLED = os.getenv('MOBSF_DYLIB_ANALYSIS_ENABLED', '1')
 DOMAIN_MALWARE_SCAN = os.getenv('MOBSF_DOMAIN_MALWARE_SCAN', '1')
 APKID_ENABLED = os.getenv('MOBSF_APKID_ENABLED', '1')
 # ==================================================
+
 # ======WINDOWS STATIC ANALYSIS SETTINGS ===========
 # Private key
 WINDOWS_VM_SECRET = os.getenv(
-'MOBSF_WINDOWS_VM_SECRET', 'mobsf/MobSF/windows_vm_priv_key.asc')
+    'MOBSF_WINDOWS_VM_SECRET',
+    'mobsf/MobSF/windows_vm_priv_key.asc',
+)
 # IP and Port of the MobSF Windows VM
-# example: WINDOWS_VM_IP = '127.0.0.1'   ;noqa E800
+# example: WINDOWS_VM_IP = '127.0.0.1'   # ← 잘못된 noqa 제거
 WINDOWS_VM_IP = os.getenv('MOBSF_WINDOWS_VM_IP')
 WINDOWS_VM_PORT = os.getenv('MOBSF_WINDOWS_VM_PORT', '8000')
 # ==================================================
@@ -83,6 +88,7 @@ JADX_BINARY = 'C:/Users/Ajin/AppData/Local/Programs/jadx/bin/jadx.bat'
 JADX_BINARY = '/Users/ajin/jadx/bin/jadx'
 """
 # ==========================================================
+
 # -------------------------
 # DYNAMIC ANALYZER SETTINGS
 # -------------------------
@@ -100,10 +106,12 @@ PROXY_PORT = int(os.getenv('MOBSF_PROXY_PORT', '1337'))
 
 # ========UPSTREAM PROXY SETTINGS ==============
 # If you are behind a Proxy
-UPSTREAM_PROXY_ENABLED = bool(os.getenv(
-'MOBSF_UPSTREAM_PROXY_ENABLED', ''))
+UPSTREAM_PROXY_ENABLED = bool(
+    os.getenv('MOBSF_UPSTREAM_PROXY_ENABLED', '')
+)
 UPSTREAM_PROXY_SSL_VERIFY = os.getenv(
-'MOBSF_UPSTREAM_PROXY_SSL_VERIFY', '1')
+    'MOBSF_UPSTREAM_PROXY_SSL_VERIFY', '1'
+)
 UPSTREAM_PROXY_TYPE = os.getenv('MOBSF_UPSTREAM_PROXY_TYPE', 'http')
 UPSTREAM_PROXY_IP = os.getenv('MOBSF_UPSTREAM_PROXY_IP', '127.0.0.1')
 UPSTREAM_PROXY_PORT = int(os.getenv('MOBSF_UPSTREAM_PROXY_PORT', '3128'))
@@ -126,6 +134,7 @@ VT_UPLOAD = bool(os.getenv('MOBSF_VT_UPLOAD', ''))
 # Files will be uploaded to VirusTotal
 # if VT_UPLOAD is set to True.
 # ===============================================
+
 # =======IOS DYNAMIC ANALYSIS SETTINGS===========
 CORELLIUM_API_DOMAIN = os.getenv('MOBSF_CORELLIUM_API_DOMAIN', '')
 CORELLIUM_API_KEY = os.getenv('MOBSF_CORELLIUM_API_KEY', '')
