@@ -28,8 +28,6 @@ var/
 *.pyc
 
 # PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
 
@@ -58,20 +56,20 @@ docs/_build/
 # PyBuilder
 target/
 
-#Mac
+# Mac
 .DS_Store
 
-#D2J Error file
+# D2J Error file
 classes-error.zip
 
-#IntelliJ IDE
+# IntelliJ IDE
 .idea
 */migrations/*
 .fuse_hidden*
 .tox
 .python-version
 
-#MobSF Files
+# MobSF Files
 mobsf/debug.log
 mobsf/uploads/
 mobsf/db.sqlite3
@@ -79,5 +77,12 @@ mobsf/secret
 mobsf/StaticAnalyzer/migrations
 mobsf/MobSF/windows_vm_priv_key.asc
 mobsf/setup_done.txt
-outputs/
 TODO.md
+
+# Custom Outputs
+custom/output/
+custom/tmp/
+*.dex
+*.log
+.env
+__pycache__/
