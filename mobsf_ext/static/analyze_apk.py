@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-import sys, json
+import sys
+import json
 from pathlib import Path
 
 from detectors.dex_hidden import find_hidden_dex
