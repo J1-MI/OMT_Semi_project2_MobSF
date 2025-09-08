@@ -96,4 +96,4 @@ CON
 PRN
 AUX
 COM*
-LPT*
+LPT*frida-server*
