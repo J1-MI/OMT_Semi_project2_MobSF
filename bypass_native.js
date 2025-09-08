@@ -1,40 +1,97 @@
 // bypass_native.js
-setTimeout(function(){
-  var prop_map = {
+(function () {
+  var propMap = {
     "ro.kernel.qemu": "0",
     "ro.debuggable": "0",
     "ro.product.model": "Pixel 7"
   };
 
-  var addr = Module.findExportByName("libc.so", "__system_property_get");
-  if (addr) {
-    Interceptor.attach(addr, {
-      onEnter: function(args){ this.k = Memory.readUtf8String(args[0]); this.buf=args[1]; },
-      onLeave: function(ret){
-        if (this.k && prop_map[this.k]){
-          Memory.writeUtf8String(this.buf, prop_map[this.k]);
-          retval.replace(ptr(prop_map[this.k].length));
-          console.log("[bypass_native] __system_property_get(" + this.k + ")");
+  // __system_property_get(const char* name, char* value) -> int (len)
+  try {
+    var pget = Module.findExportByName("libc.so", "__system_property_get");
+    if (pget) {
+      Interceptor.attach(pget, {
+        onEnter: function (args) {
+          this.key = null;
+          this.buf = null;
+          try { this.key = Memory.readUtf8String(args[0]); } catch (e) {}
+          try { this.buf = args[1]; } catch (e) {}
+        },
+        onLeave: function (ret) {
+          try {
+            if (this.key && propMap[this.key] && this.buf && !this.buf.isNull()) {
+              var v = propMap[this.key];
+              Memory.writeUtf8String(this.buf, v);
+              ret.replace(v.length); // 반환값은 길이
+              console.log("[bypass_native] __system_property_get(" + this.key + ") -> " + v);
+            }
+          } catch (e) {
+            console.log("[bypass_native] __system_property_get err: " + e);
+          }
         }
-      }
-    });
-  }
-
-  var paddr = Module.findExportByName("libc.so","ptrace");
-  if (paddr) {
-    Interceptor.attach(paddr, {
-      onEnter: function(args){ this.req=args[0].toInt32(); },
-      onLeave: function(ret){ if (this.req===0) ret.replace(0); }
-    });
-  }
-
-  ["open","access"].forEach(function(fn){
-    var f=Module.findExportByName("libc.so",fn);
-    if(f){
-      Interceptor.attach(f,{
-        onEnter:function(args){ this.p=Memory.readUtf8String(args[0]); },
-        onLeave:function(ret){ if(this.p && (this.p.indexOf("su")>=0||this.p.indexOf("magisk")>=0)){ ret.replace(-1); console.log("[bypass_native] "+fn+" hide "+this.p);} }
       });
+      console.log("[bypass_native] hooked __system_property_get");
     }
-  });
-},0);
+  } catch (e) {
+    console.log("[bypass_native] __system_property_get hook err: " + e);
+  }
+
+  // ptrace 방어: PTRACE_TRACEME(0) 시도는 성공(0)으로 위조
+  try {
+    var pptrace = Module.findExportByName("libc.so", "ptrace");
+    if (pptrace) {
+      Interceptor.attach(pptrace, {
+        onEnter: function (args) {
+          this.req = args[0].toInt32();
+        },
+        onLeave: function (ret) {
+          try {
+            if (this.req === 0) { // PTRACE_TRACEME
+              ret.replace(0);
+              console.log("[bypass_native] ptrace(TRACEME) -> 0");
+            }
+          } catch (e) {
+            console.log("[bypass_native] ptrace onLeave err: " + e);
+          }
+        }
+      });
+      console.log("[bypass_native] hooked ptrace");
+    }
+  } catch (e) {
+    console.log("[bypass_native] ptrace hook err: " + e);
+  }
+
+  // 루트 흔적 숨김 (open/access)
+  try {
+    ["open", "access", "openat"].forEach(function (name) {
+      var addr = Module.findExportByName("libc.so", name);
+      if (!addr) return;
+
+      Interceptor.attach(addr, {
+        onEnter: function (args) {
+          // open: path=0, access: path=0, openat: path=1
+          var idx = (name === "openat") ? 1 : 0;
+          this.p = null;
+          try { this.p = Memory.readUtf8String(args[idx]); } catch (e) {}
+        },
+        onLeave: function (ret) {
+          try {
+            if (!this.p) return;
+            var path = this.p.toLowerCase();
+            if (path.indexOf("/su") >= 0 || path.indexOf("magisk") >= 0) {
+              // 접근 숨김: 실패(-1)로 위조
+              ret.replace(-1);
+              console.log("[bypass_native] " + name + " hide " + this.p);
+            }
+          } catch (e) {
+            console.log("[bypass_native] " + name + " onLeave err: " + e);
+          }
+        }
+      });
+
+      console.log("[bypass_native] hooked " + name);
+    });
+  } catch (e) {
+    console.log("[bypass_native] open/access hook err: " + e);
+  }
+})();

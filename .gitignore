@@ -86,3 +86,14 @@ custom/tmp/
 *.log
 .env
 __pycache__/
+
+logs/
+outputs/
+
+# Windows reserved device names
+NUL
+CON
+PRN
+AUX
+COM*
+LPT*
